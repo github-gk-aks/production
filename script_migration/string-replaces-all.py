@@ -12,7 +12,7 @@ def replace_strings(excel_path, repo_path):
     exclude_dirs = ['./input_migration', './.git', './script_migration']
 
     # Get list of all files in repository (excluding .git directory)
-    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if not any(os.path.abspath(dp).startswith(os.path.abspath(exclude_dir)) for exclude_dir in exclude_dirs)]
+    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if not any(os.path.abspath(dp) == os.path.abspath(exclude_dir) for exclude_dir in exclude_dirs)]
 
     # Iterate through all files
     for file_path in all_files:
