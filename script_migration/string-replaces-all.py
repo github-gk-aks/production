@@ -9,7 +9,7 @@ def replace_strings(excel_path, repo_path):
     sheet = wb.active
 
     # Get list of all files in repository (excluding .git directory)
-    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if '.git' not in dp]
+    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if dp != '.git']
 
     # Iterate through all files
     for file_path in all_files:
