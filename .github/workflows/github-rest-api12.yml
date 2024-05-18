@@ -25,7 +25,7 @@ jobs:
       - name: Checking out the repository
         uses: actions/checkout@v4
         with:
-          repository: gk-aks-Confidential/fifthgithubrepo
+          repository: gk-aks-Digital/fifthgithubrepo
           token: ${{ secrets.B_TOKEN}}
           ref: v2.2.1
           path: ./github/actions/Pepsi250mlcan

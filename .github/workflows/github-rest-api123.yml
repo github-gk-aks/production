@@ -27,7 +27,7 @@ jobs:
       - name: Checking out the repository
         uses: actions/checkout@v4
         with:
-          repository: gk-aks-Shared/fourthgithubrepo
+          repository: gk-aks-Digital/fourthgithubrepo
           token: ${{ secrets.GITHUB_TOKEN}}
           ref: v2.2.1
           path: ./github/actions/Coke2litre
