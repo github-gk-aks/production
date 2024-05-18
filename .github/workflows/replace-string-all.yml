@@ -36,9 +36,9 @@ jobs:
 
       - name: Replace Strings in YML files
         run: |
-          python script/string-replaces-all.py
+          python script_migration/string-replaces-all.py
         env:
-          EXCEL_FILE: "data/File-Replacement.xlsx"
+          EXCEL_FILE: "input_migration/File-Replacement.xlsx"
           GITHUB_WORKSPACE: ${{ github.workspace }}
         shell: bash
 
