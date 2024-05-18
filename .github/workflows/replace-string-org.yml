@@ -32,7 +32,7 @@
               pip install openpyxl pandas
     
           - name: Replace Strings in files based on Excel mapping
-            run: python script_migration/replace-string-org.py
+            run: python script_migration/string-replaces-org.py
             env:
               EXCEL_FILE: ${{ github.workspace }}/input_migration/File-Replacement1.xlsx
               REPOSITORY: ${{ github.event.inputs.repository }}
