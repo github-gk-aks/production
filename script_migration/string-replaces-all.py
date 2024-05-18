@@ -13,6 +13,7 @@ def replace_strings(excel_path, repo_path):
 
     # Iterate through all files
     for file_path in all_files:
+        print(f"Processing file: {file_path}")  # Print the file pat
         # Iterate through all files
         if file_path.endswith('.xlsx'):
             continue
