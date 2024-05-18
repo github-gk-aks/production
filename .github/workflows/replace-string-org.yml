@@ -32,27 +32,11 @@
               pip install openpyxl pandas
     
           - name: Replace Strings in files based on Excel mapping
-            run: |
-              import openpyxl, pandas as pd, os
-    
-              # Load spreadsheet data into DataFrame.
-              df = pd.read_excel('${{ github.workspace }}/input_migration/File-Replacement1.xlsx')
-    
-              # Fetching destination organization based on input repository.
-              destination_org = df[df['Repository'] == '${{ github.event.inputs.repository }}']['Target Organization'].values[0]
-    
-              # Logic to replace strings in files.
-              for root, dirs, files in os.walk('${{ github.workspace }}'):
-                  for file in files:
-                      filepath = os.path.join(root, file)
-                      with open(filepath, 'r') as f:
-                          content = f.read()
-                      content_new = content.replace('gk-aks-Digital', destination_org)
-                      with open(filepath, 'w') as f:
-                          f.write(content_new)
+            run: python replace-string-org.py
             env:
+              EXCEL_FILE: ${{ github.workspace }}/input_migration/File-Replacement1.xlsx
+              REPOSITORY: ${{ github.event.inputs.repository }}
               GITHUB_WORKSPACE: ${{ github.workspace }}
-            shell: bash
     
           - name: Import GPG key
             run: |
