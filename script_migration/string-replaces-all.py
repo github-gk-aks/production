@@ -9,7 +9,7 @@ def replace_strings(excel_path, repo_path):
     sheet = wb.active
 
     # List of directories to exclude
-    exclude_dirs = ['./input_migration', './.git', './script_migration']
+    exclude_dirs = [os.path.join(repo_path, 'input_migration'), os.path.join(repo_path, '.git'), os.path.join(repo_path, 'script_migration')]
 
     # Get list of all files in repository (excluding .git directory)
     all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if not any(os.path.abspath(dp) == os.path.abspath(exclude_dir) for exclude_dir in exclude_dirs)]
