@@ -14,12 +14,12 @@ def replace_strings(excel_path, repo_path):
     # Get list of all files in repository (excluding .git directory)
     all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if not any(os.path.abspath(dp) == os.path.abspath(exclude_dir) for exclude_dir in exclude_dirs)]
 
+    print(f"All files: {all_files}")
+
     # Iterate through all files
     for file_path in all_files:
         print(f"Processing file: {file_path}")  # Print the file pat
         # Iterate through all files
-        if file_path.endswith('.xlsx'):
-            continue
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
