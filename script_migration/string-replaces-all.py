@@ -9,10 +9,20 @@ def replace_strings(excel_path, repo_path):
     sheet = wb.active
 
     # List of directories to exclude
-    exclude_dirs = [os.path.join(repo_path, 'input_migration'), os.path.join(repo_path, '.git/'), os.path.join(repo_path, 'script_migration')]
+    exclude_dirs = [
+        os.path.abspath(os.path.join(repo_path, 'input_migration')),
+        os.path.abspath(os.path.join(repo_path, '.git')),
+        os.path.abspath(os.path.join(repo_path, 'script_migration'))
+    ]
 
     # Get list of all files in repository (excluding .git directory)
-    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if not any(os.path.abspath(dp).startswith(os.path.abspath(exclude_dir)) for exclude_dir in exclude_dirs)]
+    all_files = []
+    for dp, dn, filenames in os.walk(repo_path):
+        abs_dp = os.path.abspath(dp)
+        if not any(abs_dp == exclude_dir or abs_dp.startswith(exclude_dir + os.sep) for exclude_dir in exclude_dirs):
+            for f in filenames:
+                all_files.append(os.path.join(dp, f))
+    #all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(repo_path) for f in filenames if not any(os.path.abspath(dp).startswith(os.path.abspath(exclude_dir)) for exclude_dir in exclude_dirs)]
 
     print(f"All files: {all_files}")
 
