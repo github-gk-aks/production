@@ -1,0 +1,19 @@
+# This is a sample CODEOWNERS file
+
+# Team responsible for the entire repository
+*       @github-team-name
+
+# Individual owner for a specific directory
+/docs/* @john_doe
+
+# Specify multiple owners separated by spaces
+/src/file1.js @alice @bob
+
+# Wildcard to match files in any subdirectory
+/src/**/*.css @design-team
+
+# Specify owners for a specific file
+/src/config.yaml @ops-team
+
+# You can also use email addresses
+/src/file2.js alice@example.com
