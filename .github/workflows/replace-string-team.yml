@@ -31,7 +31,7 @@ jobs:
           pip install openpyxl pandas
 
       - name: Replace Strings in files based on Excel mapping
-        run: python script_migration/replace-string-team.py
+        run: python script_migration/string-replace-team.py
         env:
           EXCEL_FILE_SOURCE: ${{ github.workspace }}/input_migration/Source-GitHub-Teams.xlsx
           EXCEL_FILE_TARGET: ${{ github.workspace }}/input_migration/String-Replacement-Teams-Only.xlsx
