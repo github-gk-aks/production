@@ -7,3 +7,9 @@ gk-aks-Confidential
 @gk-aks-Confidential/
 Testing-gk-aks-Confidential
 @gk-aks-Shared/firstgithubrepo
+
+
+Testing Team name - gk-aks-Digital/cloud-foundation-First
+Second-gk-aks-Digital/cloud-foundation-networking
+
+gk-aks-Digital/my-account

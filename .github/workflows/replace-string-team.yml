@@ -1,0 +1,84 @@
+name: Replace Strings Teams
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      repository:
+        type: string
+        description: 'Repository name'
+        required: true
+
+jobs:
+  replace-strings-team:
+    if: ${{ github.event_name != 'push' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GK_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |  
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas
+
+      - name: Replace Strings in files based on Excel mapping
+        run: python script_migration/replace-string-team.py
+        env:
+          EXCEL_FILE_SOURCE: ${{ github.workspace }}/input_migration/Source-GitHub-Teams.xlsx
+          EXCEL_FILE_TARGET: ${{ github.workspace }}/input_migration/String-Replacement-Teams-Only.xlsx
+          REPOSITORY: ${{ github.event.inputs.repository }}
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+
+      - name: Import GPG key
+        run: |
+          echo "${GPG_PRIVATE_KEY}" | gpg --batch --import
+        env: 
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Add the custom gpg signing program that passes the passphrase to the gpg CLI
+        run: |
+          rm -rf /tmp/gpg.sh
+          echo '#!/bin/bash' >> /tmp/gpg.sh
+          echo 'gpg --batch --pinentry-mode=loopback --passphrase $GPG_KEY_PASSPHRASE $@' >> /tmp/gpg.sh
+          chmod +x /tmp/gpg.sh
+
+      - name: Setup git
+        run: |
+            git config commit.gpgsign true
+            git config user.signingkey $GPG_KEY_ID
+            git config gpg.program /tmp/gpg.sh
+        env:
+            GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit. Skipping commit step."
+            echo "::set-output name=changes::false"
+          else
+            echo "::set-output name=changes::true"
+          fi
+        shell: bash
+
+      - name: Commit Changes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+            git config user.email ${{ secrets.GIT_COMMITTER_EMAIL }}
+            git config user.name ${{ secrets.GIT_COMMITTER_NAME }}
+            git add .
+            git commit -m "Replaced occurrences of Old GitHub Org - $(date +"%Y-%m-%d %H:%M:%S")"
+            git push # Replace 'branch-name' with the branch name
+        env:
+            GPG_KEY_PASSPHRASE: ${{ secrets.PASSPHRASE }}
+            GITHUB_WORKSPACE: ${{ github.workspace }}
+            GITHUB_TOKEN: ${{ secrets.GK_PAT }}

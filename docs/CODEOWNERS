@@ -4,16 +4,16 @@
 *       @github-team-name
 
 # Individual owner for a specific directory
-/docs/* @john_doe
+/docs/* @gk-aks-Digital/cloud-foundation
 
 # Specify multiple owners separated by spaces
-/src/file1.js @alice @bob
+/src/file1.js @alice @gk-aks-Digital/my-account
 
 # Wildcard to match files in any subdirectory
-/src/**/*.css @design-team
+/src/**/*.css @gk-aks-Digital/canopy @gk-aks-Digital/dotcom
 
 # Specify owners for a specific file
 /src/config.yaml @ops-team
 
 # You can also use email addresses
-/src/file2.js alice@example.com
+/src/file2.js @gk-aks-Digital/platform @gk-aks-Digital/front-end-platform
