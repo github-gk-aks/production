@@ -22,7 +22,6 @@ def replace_strings(excel_path, repo_path, repository):
 
     # List of exclude strings
     exclude_patterns = df['Exclude Strings'].dropna().tolist()
-    exclude_regex = '|'.join(re.escape(pattern) for pattern in exclude_patterns)
 
     # Get list of all files in repository (excluding specified directories)
     all_files = []
@@ -34,7 +33,7 @@ def replace_strings(excel_path, repo_path, repository):
                     all_files.append(os.path.join(dp, f))
 
     print(f"All files: {all_files}")
-    
+
     # Iterate through all files
     for file_path in all_files:
         print(f"Processing file: {file_path}")  # Print the file path
@@ -42,17 +41,14 @@ def replace_strings(excel_path, repo_path, repository):
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            # Replace standalone gk-aks-Digital not followed by exclude patterns
-            pattern = re.compile(r'gk-aks-Digital(?!/({}))'.format(exclude_regex))
-            content_new = pattern.sub(destination_org, content)
+            # Check for exclusions first
+            should_exclude = any(pattern in content for pattern in exclude_patterns)
 
-            # Replace gk-aks-Digital/whatever unless in exclude list
-            if exclude_regex:
-                pattern_exclude = re.compile(r'gk-aks-Digital/(?!({})).*?'.format(exclude_regex))
-                content_new = pattern_exclude.sub(lambda x: x.group(0).replace('gk-aks-Digital', destination_org), content_new)
+            if not should_exclude:
+                # Replace standalone gk-aks-Digital not followed by exclude patterns
+                content_new = re.sub(r'\bgk-aks-Digital\b', destination_org, content)
             else:
-                # If no exclude patterns, just replace all occurrences
-                content_new = content_new.replace('gk-aks-Digital', destination_org)
+                content_new = content
 
             # Write back to the file if changes were made
             if content != content_new:
