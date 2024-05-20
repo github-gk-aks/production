@@ -13,3 +13,13 @@ Testing Team name - gk-aks-CONFIDENTIAL\cloud-foundation-write-First
 Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 
 gk-aks-CONFIDENTIAL\my-account-write
+
+
+gk-aks-Digital\Gk-KG
+gk-aks-Digital\Testing12345
+
+
+This is a good gk-aks-Digital repository
+
+Done with this gk-aks-Digital\cf-tf-module-ecs
+
