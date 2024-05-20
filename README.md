@@ -15,11 +15,11 @@ Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 gk-aks-CONFIDENTIAL\my-account-write
 
 
-gk-aks-Digital\Gk-KG
-gk-aks-Digital\Testing12345
+gk-aks-Confidential\Gk-KG
+gk-aks-Confidential\Testing12345
 
 
-This is a good gk-aks-Digital repository
+This is a good gk-aks-Confidential repository
 
 Done with this gk-aks-Confidential\cf-tf-module-ecs
 
