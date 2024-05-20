@@ -37,7 +37,7 @@ def replace_strings(excel_path, repo_path, repository):
                 content = f.read()
 
             # Replace strings in file content
-            content_new = content.replace('gk-aks-Digital', destination_org)
+            content_new = content.replace('gk-aks-Confidential', destination_org)
 
             # Write back to the file
             with open(file_path, 'w', encoding='utf-8') as f:
