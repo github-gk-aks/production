@@ -46,7 +46,7 @@ def replace_strings(excel_path, repo_path, repository):
 
             if not should_exclude:
                 # Replace standalone gk-aks-Digital not followed by exclude patterns
-                content_new = re.sub(r'\bgk-aks-Digital\b', destination_org, content)
+                content_new = re.sub(r'gk-aks-Digital(?=\W|$)', destination_org, content)
             else:
                 content_new = content
 
