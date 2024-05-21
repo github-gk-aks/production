@@ -16,7 +16,7 @@ def replace_strings(excel_path, repo_path, repository):
 
     exclude_strings = df['Exclude Strings'].dropna().tolist()
     print(f"Exclude Strings: {exclude_strings}")
-    
+
     # exclude_patterns = []
     # for exclude_string in exclude_strings:
     #     exclude_patterns.extend(exclude_string.split('|'))
@@ -56,7 +56,7 @@ def replace_strings(excel_path, repo_path, repository):
             # Replace strings in file content
             def replace_func(match):
                 matched_string = match.group(0)
-                if any(re.search(re.escape(pattern), matched_string) for pattern in exclude_patterns):
+                if any(re.search(re.escape(pattern), matched_string, re.IGNORECASE) for pattern in exclude_patterns):
                     return matched_string  # Return the original if it matches any exclude pattern
                 else:
                     return matched_string.replace('gk-aks-Digital', destination_org)
