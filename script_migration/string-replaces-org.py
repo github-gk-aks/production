@@ -22,7 +22,8 @@ def replace_strings(excel_path, repo_path, repository):
     #     exclude_patterns.extend(exclude_string.split('|'))
 
     # Escape exclude strings for regex
-    exclude_patterns = exclude_strings
+    #exclude_patterns = exclude_strings
+    exclude_patterns = [re.escape(pattern) for pattern in exclude_strings]
     print(f"Exclude Patterns: {exclude_patterns}")
     
     # List of directories to exclude
@@ -59,7 +60,7 @@ def replace_strings(excel_path, repo_path, repository):
                 if any(re.search(re.escape(pattern), matched_string, re.IGNORECASE) for pattern in exclude_patterns):
                     return matched_string  # Return the original if it matches any exclude pattern
                 else:
-                    return matched_string.replace('gk-aks-Digital', destination_org, flags=re.IGNORECASE)
+                    return re.sub(r'gk-aks-Digital', destination_org, matched_string, flags=re.IGNORECASE)
 
             content_new = re.sub(r'gk-aks-Digital\S*', replace_func, content, flags=re.IGNORECASE)
 
