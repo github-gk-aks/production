@@ -4,7 +4,7 @@ Trying to test out the production run
 gk-aks-Confidential/teams/my-teams
 gk-aks-Confidential
 @gk-aks-Confidential/production/issues
-@gk-aks-Digital/
+@gk-aks-Confidential/
 Testing-gk-aks-Confidential
 @gk-aks-Shared/firstgithubrepo
 
@@ -14,14 +14,14 @@ Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 
 gk-aks-CONFIDENTIAL\my-account-write
 
-gk-aks-Digital\Gk-KG
+gk-aks-Confidential\Gk-KG
 
 gk-aks-Digital\Testing12345
 
-This is a good gk-aks-Digital repository
+This is a good gk-aks-Confidential repository
 
 Done with this gk-aks-Digital\cf-tf-module-ecs
 
-@gk-aks-Digital/
+@gk-aks-Confidential/
 
-@gk-aks-Digital-true
+@gk-aks-Confidential-true
