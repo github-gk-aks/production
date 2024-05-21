@@ -21,7 +21,7 @@ def replace_strings(excel_path, repo_path, repository):
     exclude_extensions = {'.gif', '.jpeg', '.png', '.ico', '.pdf', '.jpg'}
 
     # List of exclude strings
-    exclude_patterns = df['Exclude Strings'].dropna().tolist()
+    exclude_patterns = [pattern.replace('\\', '\\\\') for pattern in df['Exclude Strings'].dropna().tolist()]
 
     # Get list of all files in repository (excluding specified directories)
     all_files = []
