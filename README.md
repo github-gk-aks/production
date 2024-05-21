@@ -16,12 +16,12 @@ gk-aks-CONFIDENTIAL\my-account-write
 
 gk-aks-Confidential\Gk-KG
 
-gk-aks-Digital\Testing12345
+gk-aks-Confidential\Testing12345
 
 This is a good gk-aks-Confidential repository
 
-Done with this gk-aks-Digital\cf-tf-module-ecs
+Done with this gk-aks-Confidential\cf-tf-module-ecs
 
-@gk-aks-Digital/
+@gk-aks-Confidential/
 
 @gk-aks-Confidential-true
