@@ -12,18 +12,7 @@ Testing-gk-aks-Confidential
 Testing Team name - gk-aks-CONFIDENTIAL\cloud-foundation-write-First
 Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 
-gk-aks-CONFIDENTIAL\my-account-write
+@gk-aks-Digital/gk-kg
+@gk-aks-Digital/gk-aks-Digital\JamesRepo
 
-gk-aks-Confidential\Gk-KG
-
-gk-aks-Digital\Testing12345
-
-This is a good gk-aks-Confidential repository
-
-Done with this gk-aks-Digital\cf-tf-module-ecs
-
-@gk-aks-Shared/
-
-@gk-aks-Shared-true
-
-gk-aks-Digital\JamesRepogk-aks-Digital\JamesRepo
+@gk-aks-Digital
