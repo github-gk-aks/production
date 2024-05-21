@@ -24,4 +24,4 @@ Done with this gk-aks-Digital\cf-tf-module-ecs
 
 @gk-aks-Confidential/
 
-@gk-aks-Digital-true
+@gk-aks-Confidential-true
