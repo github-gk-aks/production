@@ -13,6 +13,6 @@ Testing Team name - gk-aks-CONFIDENTIAL\cloud-foundation-write-First
 Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 
 @gk-aks-Digital/gk-kg
-@gk-aks-Digital/gk-aks-Digital\JamesRepo
+@gk-aks-Digital/gk-aks-Digital/JamesRepo
 
 @gk-aks-Digital
