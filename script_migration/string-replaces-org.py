@@ -59,9 +59,9 @@ def replace_strings(excel_path, repo_path, repository):
                 if any(re.search(re.escape(pattern), matched_string, re.IGNORECASE) for pattern in exclude_patterns):
                     return matched_string  # Return the original if it matches any exclude pattern
                 else:
-                    return matched_string.replace('gk-aks-Digital', destination_org)
+                    return matched_string.replace('gk-aks-Digital', destination_org, flags=re.IGNORECASE)
 
-            content_new = re.sub(r'gk-aks-Digital\S*', replace_func, content)
+            content_new = re.sub(r'gk-aks-Digital\S*', replace_func, content, flags=re.IGNORECASE)
 
             # Write back to the file if changes were made
             if content != content_new:
