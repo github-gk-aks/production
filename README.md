@@ -22,6 +22,6 @@ This is a good gk-aks-Confidential repository
 
 Done with this gk-aks-Digital\cf-tf-module-ecs
 
-@gk-aks-Confidential/
+@gk-aks-Digital/
 
 @gk-aks-Confidential-true

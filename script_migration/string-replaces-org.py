@@ -14,12 +14,14 @@ def replace_strings(excel_path, repo_path, repository):
     exclude_strings = df['Exclude Strings'].values
     print(f"Exclude Strings: {exclude_strings}")
     
-    exclude_patterns = []
-    for exclude_string in exclude_strings:
-        exclude_patterns.extend(exclude_string.split('|'))
-    
-    print(f"Exclude Patterns: {exclude_patterns}")
+    # exclude_patterns = []
+    # for exclude_string in exclude_strings:
+    #     exclude_patterns.extend(exclude_string.split('|'))
 
+    # Escape exclude strings for regex
+    exclude_patterns = [re.escape(pattern) for pattern in exclude_strings]
+    print(f"Exclude Patterns: {exclude_patterns}")
+    
     # List of directories to exclude
     exclude_dirs = [
         os.path.abspath(os.path.join(repo_path, 'input_migration')),
