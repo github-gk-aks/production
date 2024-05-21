@@ -41,14 +41,8 @@ def replace_strings(excel_path, repo_path, repository):
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            # Check for exclusions first
-            should_exclude = any(pattern in content for pattern in exclude_patterns)
-
-            if not should_exclude:
-                # Replace standalone gk-aks-Digital not followed by exclude patterns
-                content_new = re.sub(r'gk-aks-Digital(?=\W|$)', destination_org, content)
-            else:
-                content_new = content
+            # Replace "gk-aks-Digital" with destination_org, unless it's followed by an exclude pattern
+            content_new = re.sub(r'gk-aks-Digital(?=(?:' + '|'.join(exclude_patterns) + r')|\W|$)', destination_org, content)
 
             # Write back to the file if changes were made
             if content != content_new:
