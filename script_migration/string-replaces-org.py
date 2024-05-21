@@ -22,8 +22,8 @@ def replace_strings(excel_path, repo_path, repository):
     #     exclude_patterns.extend(exclude_string.split('|'))
 
     # Escape exclude strings for regex
-    #exclude_patterns = exclude_strings
-    exclude_patterns = [re.escape(pattern) for pattern in exclude_strings]
+    exclude_patterns = exclude_strings
+    #exclude_patterns = [re.escape(pattern) for pattern in exclude_strings]
     print(f"Exclude Patterns: {exclude_patterns}")
     
     # List of directories to exclude

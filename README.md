@@ -18,9 +18,9 @@ Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 @gk-aks-Shared
 
 
-gk-aks-Shared/JamesRepo
+gk-AKS-Digital/JamesRepo
 
-@gk-aks-Shared-teri jai ho
+@gk-aks-DIGITAL-teri jai ho
 
 
 gk-aks-Shared/testing
