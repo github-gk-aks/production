@@ -10,6 +10,16 @@ def replace_strings(excel_path, repo_path, repository):
     # Fetching destination organization based on input repository.
     destination_org = df[df['Repository'] == repository]['Target Organization'].values[0]
 
+    # Fetching all exclude strings
+    exclude_strings = df['Exclude Strings'].values
+    print(f"Exclude Strings: {exclude_strings}")
+    
+    exclude_patterns = []
+    for exclude_string in exclude_strings:
+        exclude_patterns.extend(exclude_string.split('|'))
+    
+    print(f"Exclude Patterns: {exclude_patterns}")
+
     # List of directories to exclude
     exclude_dirs = [
         os.path.abspath(os.path.join(repo_path, 'input_migration')),
@@ -19,9 +29,6 @@ def replace_strings(excel_path, repo_path, repository):
 
     # List of file extensions to exclude
     exclude_extensions = {'.gif', '.jpeg', '.png', '.ico', '.pdf', '.jpg'}
-
-    # List of exclude strings
-    exclude_patterns = [pattern.replace('\\', '\\\\') for pattern in df['Exclude Strings'].dropna().tolist()]
 
     # Get list of all files in repository (excluding specified directories)
     all_files = []
@@ -33,16 +40,23 @@ def replace_strings(excel_path, repo_path, repository):
                     all_files.append(os.path.join(dp, f))
 
     print(f"All files: {all_files}")
-
+    
     # Iterate through all files
     for file_path in all_files:
-        print(f"Processing file: {file_path}")  # Print the file path
+        print(f"Processing file: {file_path}")
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
-            # Replace "gk-aks-Digital" with destination_org, unless it's followed by an exclude pattern
-            content_new = re.sub(r'gk-aks-Digital(?=(?:' + '|'.join(exclude_patterns) + r')|\W|$)', destination_org, content)
+            # Replace strings in file content
+            def replace_func(match):
+                matched_string = match.group(0)
+                if any(re.search(re.escape(pattern), matched_string) for pattern in exclude_patterns):
+                    return matched_string  # Return the original if it matches any exclude pattern
+                else:
+                    return matched_string.replace('gk-aks-Digital', destination_org)
+
+            content_new = re.sub(r'gk-aks-Digital\S*', replace_func, content)
 
             # Write back to the file if changes were made
             if content != content_new:
