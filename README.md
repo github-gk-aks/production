@@ -13,9 +13,9 @@ Testing Team name - gk-aks-CONFIDENTIAL\cloud-foundation-write-First
 Second-gk-aks-CONFIDENTIAL\cloud-foundation-write-networking
 
 @gk-aks-Shared/gk-kg
-@gk-aks-Digital/gk-aks-Digital/JamesRepo
+@gk-aks-Shared/gk-aks-Shared/JamesRepo
 
 @gk-aks-Shared
 
 
-gk-AKS-digital/testing
+gk-aks-Shared/testing
