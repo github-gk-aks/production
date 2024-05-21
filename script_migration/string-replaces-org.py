@@ -11,7 +11,10 @@ def replace_strings(excel_path, repo_path, repository):
     destination_org = df[df['Repository'] == repository]['Target Organization'].values[0]
 
     # Fetching all exclude strings
-    exclude_strings = df['Exclude Strings'].values
+    # exclude_strings = df['Exclude Strings'].values
+    # print(f"Exclude Strings: {exclude_strings}")
+
+    exclude_strings = df['Exclude Strings'].dropna().tolist()
     print(f"Exclude Strings: {exclude_strings}")
     
     # exclude_patterns = []
@@ -19,7 +22,7 @@ def replace_strings(excel_path, repo_path, repository):
     #     exclude_patterns.extend(exclude_string.split('|'))
 
     # Escape exclude strings for regex
-    exclude_patterns = [re.escape(pattern) for pattern in exclude_strings]
+    exclude_patterns = exclude_strings
     print(f"Exclude Patterns: {exclude_patterns}")
     
     # List of directories to exclude
