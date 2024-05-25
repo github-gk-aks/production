@@ -30,7 +30,8 @@ def replace_strings(excel_path, repo_path, repository):
     exclude_dirs = [
         os.path.abspath(os.path.join(repo_path, 'input_migration')),
         os.path.abspath(os.path.join(repo_path, '.git')),
-        os.path.abspath(os.path.join(repo_path, 'script_migration'))
+        os.path.abspath(os.path.join(repo_path, 'script_migration')),
+        os.path.abspath(os.path.join(repo_path, '.github'))
     ]
 
     # List of file extensions to exclude

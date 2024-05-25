@@ -1,0 +1,89 @@
+name: Find and Record Strings
+
+on:
+  workflow_dispatch:
+
+jobs:
+  find-strings:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout central repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GK_PAT }}
+          path: ./source-repo
+
+      - name: Check if output directory exists
+        run: |
+          if [ ! -d "${{ github.workspace }}/source-repo/output" ]; then
+            echo "Output directory does not exist. Creating..."
+            mkdir -p "${{ github.workspace }}/source-repo/output"
+          else
+            echo "Output directory already exists."
+          fi
+  
+      - name: Import GPG key
+        run: |
+          echo "${GPG_PRIVATE_KEY}" | gpg --batch --import
+        env: 
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Add the custom gpg signing program that passes the passphrase to the gpg CLI
+        run: |
+          rm -rf /tmp/gpg.sh
+          echo '#!/bin/bash' >> /tmp/gpg.sh
+          echo 'gpg --batch --pinentry-mode=loopback --passphrase $GPG_KEY_PASSPHRASE $@' >> /tmp/gpg.sh
+          chmod +x /tmp/gpg.sh
+
+      - name: Setup git
+        run: |
+          git config --global user.email ${{ secrets.GIT_COMMITTER_EMAIL }}
+          git config --global user.name ${{ secrets.GIT_COMMITTER_NAME }}
+          git config --global commit.gpgsign true
+          git config --global user.signingkey $GPG_KEY_ID
+          git config --global gpg.program /tmp/gpg.sh
+        env:
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+  
+
+      - name: Iterate Over Repos
+        run: |
+          mapfile -t repositories < "${{ github.workspace }}/source-repo/repositories.txt"
+          for repo in "${repositories[@]}"; do
+            IFS='/' read -r org_name repo_name <<< "$repo"
+            echo "Processing repository: $org_name/$repo_name"
+            git clone -b github-migration "https://{{ secrets.GK_PAT }}@github.com/$repo.git" "./target-repo"
+
+            echo "Searching for the string 'gk-aks-DIGITAL' in the entire repository, excluding certain file extensions..."
+
+            find ./target-repo -type f ! -iname "*.jpg" ! -iname "*.jpeg" ! -iname "*.xlsx" ! -iname "*.pdf" ! -iname "*.woff" ! -iname "*.woff2" ! -iname "*.png" ! -iname "*.gif" ! -iname "*.ico" -print0 | while IFS= read -r -d '' file; do
+              if grep -Iq . "$file"; then
+                if grep -iq 'gk-aks-DIGITAL' "$file"; then
+                  echo "Processing file: $file"
+                  echo "Repo:$repo, File:$file, Matched String:gk-aks-DIGITAL" >> "${{ github.workspace }}/source-repo/output/result-check-gk-aks-DIGITAL.txt"
+                else
+                  echo "Repo:$repo, File:$file, No match found" >> "${{ github.workspace }}/source-repo/output/result-check-gk-aks-DIGITAL.txt"
+                fi
+              else
+                echo "Repo:$repo, File:$file, Not a text file or unable to read" >> "${{ github.workspace }}/source-repo/output/result-check-gk-aks-DIGITAL.txt"
+              fi
+            done
+
+            rm -rf "./target-repo"
+          done
+
+      - name: Commit Changes
+        run: |
+          cd ${{ github.workspace }}/source-repo/output
+          if [ -n "$(git status --porcelain)" ]; then
+            git pull origin main
+            git add result-check-gk-aks-DIGITAL.txt
+            git commit -S -m "Add result-check-gk-aks-DIGITAL.txt - $(date +"%Y-%m-%d %H:%M:%S")"
+            git push origin main
+          else
+            echo "There are no changes to commit."
+          fi
+        working-directory: ${{ github.workspace }}
+        env:
+          GPG_KEY_PASSPHRASE: ${{ secrets.PASSPHRASE }}
