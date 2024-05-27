@@ -3,12 +3,14 @@
     
     on:
       push:
-      workflow_dispatch:
-        inputs:
-          repository:
-            type: string
-            description: 'Repository name'
-            required: true
+      repository_dispatch:
+        types: [replace-string-org]
+      # workflow_dispatch:
+      #   inputs:
+      #     repository:
+      #       type: string
+      #       description: 'Repository name'
+      #       required: true
     
     jobs:
       replace-strings-org:
@@ -20,6 +22,8 @@
             uses: actions/checkout@v4
             with:
               token: ${{ secrets.GK_PAT }}
+              ref: ${{ github.event.client_payload.ref }}
+
     
           - name: Set up Python
             uses: actions/setup-python@v4
@@ -35,7 +39,7 @@
             run: python script_migration/string-replaces-org.py
             env:
               EXCEL_FILE: ${{ github.workspace }}/input_migration/File-Replacement1.xlsx
-              REPOSITORY: ${{ github.event.inputs.repository }}
+              REPOSITORY: ${{ github.event.client_payload.repository }}
               GITHUB_WORKSPACE: ${{ github.workspace }}
     
           - name: Import GPG key
@@ -82,3 +86,19 @@
                 GPG_KEY_PASSPHRASE: ${{ secrets.PASSPHRASE }}
                 GITHUB_WORKSPACE: ${{ github.workspace }}
                 GITHUB_TOKEN: ${{ secrets.GK_PAT }}
+
+          - name: Trigger Replace Strings Teams Workflow
+            run: |
+              curl -X POST \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer ${{ secrets.GK_PAT }}" \
+              https://api.github.com/repos/${{ github.repository }}/dispatches \
+                -d '{
+                  "event_type": "replace-string-team",
+                  "client_payload": {
+                    "repository": "${{ github.event.client_payload.repository }}",
+                    "ref": "${{ github.event.client_payload.ref }}"
+                  }
+                }'
+
+            

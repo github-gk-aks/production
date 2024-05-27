@@ -1,18 +1,20 @@
-name: Replace Strings Teams
+name: Replace Strings ALL
 
 on:
   push:
-  repository_dispatch:
-    types: [replace-string-team]
-  # workflow_dispatch:
-  #   inputs:
-  #     repository:
-  #       type: string
-  #       description: 'Repository name'
-  #       required: true
+  workflow_dispatch:
+    # inputs:
+    #     repository:
+    #       type: string
+    #       description: 'Repository name'
+    #       required: true
+    #     organisation:
+    #       description: 'organisation name'
+    #       type: string
+    #       required: true
 
 jobs:
-  replace-strings-team:
+  replace-strings:
     if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-latest
 
@@ -21,7 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GK_PAT }}
-          ref: ${{ github.event.client_payload.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -31,15 +32,15 @@ jobs:
       - name: Install dependencies
         run: |  
           python -m pip install --upgrade pip
-          pip install openpyxl pandas
+          pip install openpyxl
 
-      - name: Replace Strings in files based on Excel mapping
-        run: python script_migration/string-replace-team.py
+      - name: Replace Strings in YML files
+        run: |
+          python script_migration/string-replaces-all.py
         env:
-          EXCEL_FILE_SOURCE: ${{ github.workspace }}/input_migration/Source-GitHub-Teams.xlsx
-          EXCEL_FILE_TARGET: ${{ github.workspace }}/input_migration/String-Replacement-Teams-Only.xlsx
-          REPOSITORY: ${{ github.event.client_payload.repository }}
+          EXCEL_FILE: "input_migration/File-Replacement.xlsx"
           GITHUB_WORKSPACE: ${{ github.workspace }}
+        shell: bash
 
       - name: Import GPG key
         run: |
@@ -47,7 +48,7 @@ jobs:
         env: 
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
-      - name: Add the custom gpg signing program that passes the passphrase to the gpg CLI
+      - name: Add the custom gpg siging program that passes the passphrase to the gpg CLI
         run: |
           rm -rf /tmp/gpg.sh
           echo '#!/bin/bash' >> /tmp/gpg.sh
@@ -72,14 +73,14 @@ jobs:
             echo "::set-output name=changes::true"
           fi
         shell: bash
-
+ 
       - name: Commit Changes
         if: steps.check_changes.outputs.changes == 'true'
         run: |
             git config user.email ${{ secrets.GIT_COMMITTER_EMAIL }}
             git config user.name ${{ secrets.GIT_COMMITTER_NAME }}
             git add .
-            git commit -m "Replaced occurrences of Old GitHub Org - $(date +"%Y-%m-%d %H:%M:%S")"
+            git commit -m "Replaced occurances of Old Github Org - $(date +"%Y-%m-%d %H:%M:%S")"
             git push # Replace 'branch-name' with the branch name
         env:
             GPG_KEY_PASSPHRASE: ${{ secrets.PASSPHRASE }}
