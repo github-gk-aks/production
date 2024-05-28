@@ -3,14 +3,12 @@
     
     on:
       push:
-      repository_dispatch:
-        types: [replace-string-org]
-      # workflow_dispatch:
-      #   inputs:
-      #     repository:
-      #       type: string
-      #       description: 'Repository name'
-      #       required: true
+      workflow_dispatch:
+        inputs:
+          repository:
+            type: string
+            description: 'Repository name'
+            required: true
     
     jobs:
       replace-strings-org:

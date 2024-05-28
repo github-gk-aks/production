@@ -2,14 +2,12 @@ name: Replace Strings Teams
 
 on:
   push:
-  repository_dispatch:
-    types: [replace-string-team]
-  # workflow_dispatch:
-  #   inputs:
-  #     repository:
-  #       type: string
-  #       description: 'Repository name'
-  #       required: true
+  workflow_dispatch:
+    inputs:
+      repository:
+        type: string
+        description: 'Repository name'
+        required: true
 
 jobs:
   replace-strings-team:
