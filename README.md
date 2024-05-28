@@ -1,6 +1,6 @@
 # production
-gk-aks-Digital/firstgithubrepo
-gk-aks-Digital/secondgithubrepo
+gk-aks-Shared/firstgithubrepo
+gk-aks-Confidential/secondgithubrepo
 
 
 gk-aks-Digital/nx-affected-action
