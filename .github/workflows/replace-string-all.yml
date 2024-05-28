@@ -2,17 +2,18 @@ name: Replace Strings ALL
 
 on:
   push:
-  repository_dispatch:
-    types: [replace-string-all]
-    # inputs:
-    #     repository:
-    #       type: string
-    #       description: 'Repository name'
-    #       required: true
-    #     organisation:
-    #       description: 'organisation name'
-    #       type: string
-    #       required: true
+  # repository_dispatch:
+  #   types: [replace-string-all]
+  workflow_dispatch:
+    inputs:
+        repository:
+          type: string
+          description: 'Repository name'
+          required: true
+        organisation:
+          description: 'organisation name'
+          type: string
+          required: true
 
 jobs:
   replace-strings:
