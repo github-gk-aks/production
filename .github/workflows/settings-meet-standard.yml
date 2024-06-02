@@ -248,41 +248,55 @@ jobs:
          script: |
           const fs = require('fs');
           const path = require('path');
+          try {
+            const response = await github.rest.actions.setWorkflowAccessToRepository({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                access_level: 'none'
+                });
 
-          const response = await github.rest.actions.setWorkflowAccessToRepository({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-              access_level: 'none'
-            });
+                /* response=$(curl -s -o /dev/null -w "%{http_code}" -L \
+                -X PUT \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer ${{ secrets.GK_PAT }}" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                https://api.github.com/repos/${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}/${{ matrix.repository }}/actions/permissions/access \
+                -d '{"access_level":"enterprise"}')
+                echo "response=$response" >> $GITHUB_ENV */
 
-             /* response=$(curl -s -o /dev/null -w "%{http_code}" -L \
-              -X PUT \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer ${{ secrets.GK_PAT }}" \
-              -H "X-GitHub-Api-Version: 2022-11-28" \
-              https://api.github.com/repos/${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}/${{ matrix.repository }}/actions/permissions/access \
-              -d '{"access_level":"enterprise"}')
-              echo "response=$response" >> $GITHUB_ENV */
+            const statusCode = response.status;
+            const repoName = '${{ matrix.repository }}';
+            let message;
+            if (statusCode === 204) {
+                message = `Allowing access to components for Repository ${repoName} is Success`;
+            } else {
+                message = `Allowing access to components for Repository ${repoName} is not successful`;
+            }
+            core.setOutput('message', message);
+        
+            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+            const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+            // Ensure the output directory exists
+            if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+            }
+        
+            fs.appendFileSync(filePath, message + '\n'); 
+          } catch (error) {
+                const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                core.setOutput('message', message);
 
-          const statusCode = response.status;
-          const repoName = '${{ matrix.repository }}';
-          let message;
-          if (statusCode === 204) {
-            message = `Allowing access to components for Repository ${repoName} is Success`;
-          } else {
-            message = `Allowing access to components for Repository ${repoName} is not successful`;
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                    fs.mkdirSync(outputDir, { recursive: true });
+                }
+
+                fs.appendFileSync(filePath, message + '\n');
           }
-          core.setOutput('message', message);
-    
-          const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-          const filePath = path.join(outputDir, `report_${repoName}.txt`);
-    
-          // Ensure the output directory exists
-          if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true });
-          }
-    
-          fs.appendFileSync(filePath, message + '\n'); 
         continue-on-error: true
 
       - name: Replace Repository Topics
