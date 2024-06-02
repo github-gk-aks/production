@@ -333,6 +333,22 @@ jobs:
             }
         continue-on-error: true
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install pandas
+          pip install openpyxl
+
+      - name: Run Python script
+        id: python-script
+        run: |
+          python script/python-script.py "${{ matrix.repository }}"  # Pass the repository name as an argument
+
       - name: Allowing access to components in an internal repository
         id: allow-access
         uses: actions/github-script@v6
@@ -342,12 +358,14 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const repoName = '${{ matrix.repository }}';
+          const allowAccess = '${{ steps.python-script.outputs.allowAccess }}' === 'true';
+          const accessLevel = allowAccess ? 'enterprise' : 'organization';
 
           try {
             const response = await github.rest.actions.setWorkflowAccessToRepository({
                 owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
                 repo: '${{ matrix.repository }}',
-                access_level: 'none'
+                access_level: accessLevel
                 });
 
                 /* response=$(curl -s -o /dev/null -w "%{http_code}" -L \
