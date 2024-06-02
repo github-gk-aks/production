@@ -100,6 +100,7 @@ jobs:
 
             const defaultBranch = repository.default_branch;
             core.setOutput("default_branch", defaultBranch);
+            console.log(`Default branch: ${defaultBranch}`);
 
       # - name: Determine Default Branch
       #   id: default-branch
