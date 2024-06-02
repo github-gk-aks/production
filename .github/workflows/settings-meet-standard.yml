@@ -341,7 +341,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: statuses
-          path: ${{ github.workspace }}/source-repo/output/${{ matrix.repository }}.txt
+          path: ${{ github.workspace }}/source-repo/output/report_${{ matrix.repository }}.txt
 
 
 #   report:
