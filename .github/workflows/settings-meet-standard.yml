@@ -248,6 +248,8 @@ jobs:
          script: |
           const fs = require('fs');
           const path = require('path');
+          const repoName = '${{ matrix.repository }}';
+
           try {
             const response = await github.rest.actions.setWorkflowAccessToRepository({
                 owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
@@ -265,7 +267,7 @@ jobs:
                 echo "response=$response" >> $GITHUB_ENV */
 
             const statusCode = response.status;
-            const repoName = '${{ matrix.repository }}';
+
             let message;
             if (statusCode === 204) {
                 message = `Allowing access to components for Repository ${repoName} is Success`;
