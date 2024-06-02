@@ -82,6 +82,8 @@ jobs:
         with:
           github-token: ${{ secrets.GK_PAT }}
           script: |
+            const fs = require('fs');
+            const path = require('path');
             const defaultBranch = '${{ steps.default-branch.outputs.default_branch }}';
             const response = await github.rest.repos.updateBranchProtection({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
@@ -138,6 +140,8 @@ jobs:
         with:
           github-token: ${{ secrets.GK_PAT }}
           script: |
+            const fs = require('fs');
+            const path = require('path');
             const response = await github.rest.repos.enableVulnerabilityAlerts({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
               repo: '${{ matrix.repository }}',
@@ -171,6 +175,8 @@ jobs:
         with:
           github-token: ${{ secrets.GK_PAT }}
           script: |
+            const fs = require('fs');
+            const path = require('path');
             const defaultBranch = '${{ steps.default-branch.outputs.default_branch }}';
             const response = await github.rest.repos.createCommitSignatureProtection({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
@@ -205,6 +211,8 @@ jobs:
         with:
           github-token: ${{ secrets.GK_PAT }}
           script: |
+            const fs = require('fs');
+            const path = require('path');
             const response = await github.rest.actions.setGithubActionsPermissionsRepository({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
               repo: '${{ matrix.repository }}',
@@ -235,6 +243,8 @@ jobs:
       - name: Allowing access to components in an internal repository
         id: allow-access
         run: |
+          const fs = require('fs');
+          const path = require('path');
           response=$(curl -s -o /dev/null -w "%{http_code}" -L \
           -X PUT \
           -H "Accept: application/vnd.github+json" \
@@ -271,6 +281,9 @@ jobs:
         with:
           github-token: ${{ secrets.GK_PAT }}
           script: |
+            const fs = require('fs');
+            const path = require('path');
+            
             const response = await github.rest.repos.replaceAllTopics({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
               repo: '${{ matrix.repository }}',
