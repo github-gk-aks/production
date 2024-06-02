@@ -31,44 +31,59 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-
-            const response = await github.rest.repos.update({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-              has_issues: true,
-              has_pages: false,
-              has_wiki: false,
-              has_projects: false,
-              allow_merge_commit: true,
-              allow_squash_merge: true,
-              allow_rebase_merge: true,
-              allow_auto_merge: false,
-              delete_branch_on_merge: true,
-              security_and_analysis: {
-                secret_scanning: { status: 'enabled' },
-                secret_scanning_push_protection: { status: 'enabled' }
-              }
-            });
-            
-            const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
-            let message;
-            if (statusCode === 200) {
-              message = `Different settings for Repository ${repoName} is Success`;
-            } else {
-              message = `Different settings for Repository ${repoName} is not successful`;
+            
+            try {
+                const response = await github.rest.repos.update({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                has_issues: true,
+                has_pages: false,
+                has_wiki: false,
+                has_projects: false,
+                allow_merge_commit: true,
+                allow_squash_merge: true,
+                allow_rebase_merge: true,
+                allow_auto_merge: false,
+                delete_branch_on_merge: true,
+                security_and_analysis: {
+                    secret_scanning: { status: 'enabled' },
+                    secret_scanning_push_protection: { status: 'enabled' }
+                }
+                });
+                
+                const statusCode = response.status;
+                let message;
+                if (statusCode === 200) {
+                message = `Different settings for Repository ${repoName} is Success`;
+                } else {
+                message = `Different settings for Repository ${repoName} is not successful`;
+                }
+                core.setOutput('message', message);
+        
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+                }
+        
+                fs.appendFileSync(filePath, message + '\n');
+            }   catch (error) {
+                    const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                    core.setOutput('message', message);
+    
+                    const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                    const filePath = path.join(outputDir, `report_${repoName}.txt`);
+    
+                    // Ensure the output directory exists
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+    
+                    fs.appendFileSync(filePath, message + '\n');
             }
-            core.setOutput('message', message);
-      
-            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-            const filePath = path.join(outputDir, `report_${repoName}.txt`);
-      
-            // Ensure the output directory exists
-            if (!fs.existsSync(outputDir)) {
-              fs.mkdirSync(outputDir, { recursive: true });
-            }
-      
-            fs.appendFileSync(filePath, message + '\n');
         continue-on-error: true
 
       - name: Determine Default Branch
@@ -85,53 +100,68 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const defaultBranch = '${{ steps.default-branch.outputs.default_branch }}';
-            const response = await github.rest.repos.updateBranchProtection({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-              branch: defaultBranch,
-              required_pull_request_reviews: {
-                dismiss_stale_reviews: true,
-                require_code_owner_reviews: true,
-                required_approving_review_count: 2,
-                dismissal_restrictions: {
-                    users: [],
-                    teams: []
-                },
-              },
-              required_status_checks: {
-                strict: true,
-                contexts: []
-              },
-              enforce_admins: true,
-              restrictions: {
-                users: [],
-                teams: ['firstgithubrepo-teamadmin']
-              },
-              required_linear_history: true,
-              allow_force_pushes: false,
-              allow_deletions: false,
-              required_conversation_resolution: true,
-            });
-
-            const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
-            let message;
-            if (statusCode === 200) {
-              message = `Branch Protection for Repository ${repoName} is Success`;
-            } else {
-              message = `Branch Protection for Repository ${repoName} is not successful`;
+            try {
+                const response = await github.rest.repos.updateBranchProtection({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                branch: defaultBranch,
+                required_pull_request_reviews: {
+                    dismiss_stale_reviews: true,
+                    require_code_owner_reviews: true,
+                    required_approving_review_count: 2,
+                    dismissal_restrictions: {
+                        users: [],
+                        teams: []
+                    },
+                },
+                required_status_checks: {
+                    strict: true,
+                    contexts: []
+                },
+                enforce_admins: true,
+                restrictions: {
+                    users: [],
+                    teams: ['firstgithubrepo-teamadmin']
+                },
+                required_linear_history: true,
+                allow_force_pushes: false,
+                allow_deletions: false,
+                required_conversation_resolution: true,
+                });
+
+                const statusCode = response.status;
+                let message;
+                if (statusCode === 200) {
+                message = `Branch Protection for Repository ${repoName} is Success`;
+                } else {
+                message = `Branch Protection for Repository ${repoName} is not successful`;
+                }
+                core.setOutput('message', message);
+        
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+                }
+        
+                fs.appendFileSync(filePath, message + '\n');
+            }   catch (error) {
+                    const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                    core.setOutput('message', message);
+    
+                    const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                    const filePath = path.join(outputDir, `report_${repoName}.txt`);
+    
+                    // Ensure the output directory exists
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+    
+                    fs.appendFileSync(filePath, message + '\n');
             }
-            core.setOutput('message', message);
-      
-            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-            const filePath = path.join(outputDir, `report_${repoName}.txt`);
-      
-            // Ensure the output directory exists
-            if (!fs.existsSync(outputDir)) {
-              fs.mkdirSync(outputDir, { recursive: true });
-            }
-      
-            fs.appendFileSync(filePath, message + '\n');
         continue-on-error: true
 
       - name: Enable Vulnerability alerts
@@ -142,30 +172,46 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            const response = await github.rest.repos.enableVulnerabilityAlerts({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-            });
-
-            const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
-            let message;
-            if (statusCode === 204) {
-              message = `Setting of Vulnerability alerts for Repository ${repoName} is Success`;
-            } else {
-              message = `Setting of Vulnerability alerts for Repository ${repoName} is not successful`;
-            }
-            core.setOutput('message', message);
-      
-            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-            const filePath = path.join(outputDir, `report_${repoName}.txt`);
-      
-            // Ensure the output directory exists
-            if (!fs.existsSync(outputDir)) {
-              fs.mkdirSync(outputDir, { recursive: true });
-            }
-      
-            fs.appendFileSync(filePath, message + '\n');            
+
+            try {
+                const response = await github.rest.repos.enableVulnerabilityAlerts({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                });
+
+                const statusCode = response.status;
+                let message;
+                if (statusCode === 204) {
+                message = `Setting of Vulnerability alerts for Repository ${repoName} is Success`;
+                } else {
+                message = `Setting of Vulnerability alerts for Repository ${repoName} is not successful`;
+                }
+                core.setOutput('message', message);
+        
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+                }
+        
+                fs.appendFileSync(filePath, message + '\n');    
+            }   catch (error) {
+                    const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                    core.setOutput('message', message);
+    
+                    const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                    const filePath = path.join(outputDir, `report_${repoName}.txt`);
+    
+                    // Ensure the output directory exists
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+    
+                    fs.appendFileSync(filePath, message + '\n');
+            }        
 
         continue-on-error: true
 
@@ -178,31 +224,46 @@ jobs:
             const fs = require('fs');
             const path = require('path');
             const defaultBranch = '${{ steps.default-branch.outputs.default_branch }}';
-            const response = await github.rest.repos.createCommitSignatureProtection({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-              branch: defaultBranch
-            });
-
-            const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
-            let message;
-            if (statusCode === 200) {
-              message = `Setting of signed commits for Repository ${repoName} is Success`;
-            } else {
-              message = `Setting of signed commits for Repository ${repoName} is not successful`;
+            try {
+                const response = await github.rest.repos.createCommitSignatureProtection({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                branch: defaultBranch
+                });
+
+                const statusCode = response.status;
+                let message;
+                if (statusCode === 200) {
+                message = `Setting of signed commits for Repository ${repoName} is Success`;
+                } else {
+                message = `Setting of signed commits for Repository ${repoName} is not successful`;
+                }
+                core.setOutput('message', message);
+        
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+                }
+        
+                fs.appendFileSync(filePath, message + '\n'); 
+            }   catch (error) {
+                    const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                    core.setOutput('message', message);
+    
+                    const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                    const filePath = path.join(outputDir, `report_${repoName}.txt`);
+    
+                    // Ensure the output directory exists
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+    
+                    fs.appendFileSync(filePath, message + '\n');
             }
-            core.setOutput('message', message);
-      
-            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-            const filePath = path.join(outputDir, `report_${repoName}.txt`);
-      
-            // Ensure the output directory exists
-            if (!fs.existsSync(outputDir)) {
-              fs.mkdirSync(outputDir, { recursive: true });
-            }
-      
-            fs.appendFileSync(filePath, message + '\n'); 
         continue-on-error: true
 
       - name: Enable actions in repository
@@ -213,31 +274,47 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            const response = await github.rest.actions.setGithubActionsPermissionsRepository({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-              enabled: true
-            });
-
-            const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
-            let message;
-            if (statusCode === 204) {
-              message = `Enabling of actions for Repository ${repoName} is Success`;
-            } else {
-              message = `Enabling of actions for Repository ${repoName} is not successful`;
+
+            try {
+                const response = await github.rest.actions.setGithubActionsPermissionsRepository({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                enabled: true
+                });
+
+                const statusCode = response.status;
+                let message;
+                if (statusCode === 204) {
+                message = `Enabling of actions for Repository ${repoName} is Success`;
+                } else {
+                message = `Enabling of actions for Repository ${repoName} is not successful`;
+                }
+                core.setOutput('message', message);
+        
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+                }
+        
+                fs.appendFileSync(filePath, message + '\n'); 
+            }   catch (error) {
+                    const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                    core.setOutput('message', message);
+    
+                    const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                    const filePath = path.join(outputDir, `report_${repoName}.txt`);
+    
+                    // Ensure the output directory exists
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+    
+                    fs.appendFileSync(filePath, message + '\n');
             }
-            core.setOutput('message', message);
-      
-            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-            const filePath = path.join(outputDir, `report_${repoName}.txt`);
-      
-            // Ensure the output directory exists
-            if (!fs.existsSync(outputDir)) {
-              fs.mkdirSync(outputDir, { recursive: true });
-            }
-      
-            fs.appendFileSync(filePath, message + '\n'); 
         continue-on-error: true
 
       - name: Allowing access to components in an internal repository
@@ -309,32 +386,47 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-
-            const response = await github.rest.repos.replaceAllTopics({
-              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-              repo: '${{ matrix.repository }}',
-              names: []
-            });
-
-            const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
-            let message;
-            if (statusCode === 200) {
-              message = `Remove topics for Repository ${repoName} is Success`;
-            } else {
-              message = `Remove topics for Repository ${repoName} is not successful`;
+
+            try {
+                const response = await github.rest.repos.replaceAllTopics({
+                owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+                repo: '${{ matrix.repository }}',
+                names: []
+                });
+
+                const statusCode = response.status;
+                let message;
+                if (statusCode === 200) {
+                message = `Remove topics for Repository ${repoName} is Success`;
+                } else {
+                message = `Remove topics for Repository ${repoName} is not successful`;
+                }
+                core.setOutput('message', message);
+        
+                const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                const filePath = path.join(outputDir, `report_${repoName}.txt`);
+        
+                // Ensure the output directory exists
+                if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+                }
+        
+                fs.appendFileSync(filePath, message + '\n'); 
+            }   catch (error) {
+                    const message = `Allowing access to components for Repository ${repoName} failed with error: ${error.message}`;
+                    core.setOutput('message', message);
+
+                    const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+                    const filePath = path.join(outputDir, `report_${repoName}.txt`);
+
+                    // Ensure the output directory exists
+                    if (!fs.existsSync(outputDir)) {
+                        fs.mkdirSync(outputDir, { recursive: true });
+                    }
+
+                    fs.appendFileSync(filePath, message + '\n');
             }
-            core.setOutput('message', message);
-      
-            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
-            const filePath = path.join(outputDir, `report_${repoName}.txt`);
-      
-            // Ensure the output directory exists
-            if (!fs.existsSync(outputDir)) {
-              fs.mkdirSync(outputDir, { recursive: true });
-            }
-      
-            fs.appendFileSync(filePath, message + '\n'); 
         continue-on-error: true
 
       - name: Upload repo migration status
