@@ -150,7 +150,7 @@ jobs:
             const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
             let message;
-            if (statusCode === 200) {
+            if (statusCode === 204) {
               message = `Setting of Vulnerability alerts for Repository ${repoName} is Success`;
             } else {
               message = `Setting of Vulnerability alerts for Repository ${repoName} is not successful`;
@@ -222,7 +222,7 @@ jobs:
             const statusCode = response.status;
             const repoName = '${{ matrix.repository }}';
             let message;
-            if (statusCode === 200) {
+            if (statusCode === 204) {
               message = `Enabling of actions for Repository ${repoName} is Success`;
             } else {
               message = `Enabling of actions for Repository ${repoName} is not successful`;
@@ -267,7 +267,7 @@ jobs:
           const statusCode = response.status;
           const repoName = '${{ matrix.repository }}';
           let message;
-          if (statusCode === 200) {
+          if (statusCode === 204) {
             message = `Allowing access to components for Repository ${repoName} is Success`;
           } else {
             message = `Allowing access to components for Repository ${repoName} is not successful`;
