@@ -242,7 +242,10 @@ jobs:
 
       - name: Allowing access to components in an internal repository
         id: allow-access
-        run: |
+        uses: actions/github-script@v6
+        with:
+         github-token: ${{ secrets.GK_PAT }}
+         script: |
           const fs = require('fs');
           const path = require('path');
 
