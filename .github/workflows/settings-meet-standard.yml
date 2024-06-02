@@ -1,0 +1,243 @@
+name: General Settings Meet Standard
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+
+jobs:
+  setting-meet-standard:
+    if: contains(github.event.issue.labels.*.name, 'meet-standard')
+    runs-on: ubuntu-latest
+    strategy:  
+      matrix:
+        repository: ${{ fromJson(github.event.issue.body).*.repository }}  # rep01, repo02
+      fail-fast: false
+      max-parallel: 5
+
+    steps:
+      - name: Checkout central repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GK_PAT }}
+          path: ./source-repo
+
+      - name: Enable Different Settings for Repository
+        id: enable-settings
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const response = await github.rest.repos.update({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+              has_issues: true,
+              has_pages: false,
+              has_wiki: false,
+              has_projects: false,
+              allow_merge_commit: true,
+              allow_squash_merge: true,
+              allow_rebase_merge: true,
+              allow_auto_merge: false,
+              delete_branch_on_merge: true,
+              security_and_analysis: {
+                secret_scanning: { status: 'enabled' },
+                secret_scanning_push_protection: { status: 'enabled' }
+              }
+            });
+            
+            const statusCode = response.status;
+            const repoName = '${{ matrix.repository }}';
+            let message;
+            if (statusCode === 200) {
+              message = `Different settings for Repository ${repoName} is Success`;
+            } else {
+              message = `Different settings for Repository ${repoName} is not successful`;
+            }
+            core.setOutput('message', message);
+      
+            const outputDir = path.join(process.env.GITHUB_WORKSPACE, 'source-repo', 'output');
+            const filePath = path.join(outputDir, `report_${repoName}.txt`);
+      
+            // Ensure the output directory exists
+            if (!fs.existsSync(outputDir)) {
+              fs.mkdirSync(outputDir, { recursive: true });
+            }
+      
+            fs.appendFileSync(filePath, message + '\n');
+        continue-on-error: true
+
+      - name: Determine Default Branch
+        id: default-branch
+        run: echo "::set-output name=default_branch::$(git ls-remote --symref https://github.com/${{ github.repository }} HEAD | awk -F '/' '{print $NF}' | awk '{print $1}')"
+        continue-on-error: true
+
+      - name: Enable Branch Protection Rule for Repo
+        id: branch-protection
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+            const defaultBranch = '${{ steps.default-branch.outputs.default_branch }}';
+            const response = await github.rest.repos.updateBranchProtection({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+              branch: defaultBranch,
+              required_pull_request_reviews: {
+                dismiss_stale_reviews: true,
+                require_code_owner_reviews: true,
+                required_approving_review_count: 2,
+                dismissal_restrictions: {
+                    users: [],
+                    teams: []
+                },
+              },
+              required_status_checks: {
+                strict: true,
+                contexts: []
+              },
+              enforce_admins: true,
+              restrictions: {
+                users: [],
+                teams: ['firstgithubrepo-teamadmin']
+              },
+              required_linear_history: true,
+              allow_force_pushes: false,
+              allow_deletions: false,
+              required_conversation_resolution: true,
+            });
+            return response.status;
+        continue-on-error: true
+
+      - name: Enable Vulnerability alerts
+        id: enable-alerts
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+            const response = await github.rest.repos.enableVulnerabilityAlerts({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+            });
+            return response.status;
+        continue-on-error: true
+
+      - name: Require Signed Commits
+        id: signed-commits
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+            const defaultBranch = '${{ steps.default-branch.outputs.default_branch }}';
+            const response = await github.rest.repos.createCommitSignatureProtection({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+              branch: defaultBranch
+            });
+            return response.status;
+        continue-on-error: true
+
+      - name: Enable actions in repository
+        id: enable-actions
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+            const response = await github.rest.actions.setGithubActionsPermissionsRepository({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+              enabled: true
+            });
+            return response.status;
+        continue-on-error: true
+
+      - name: Allowing access to components in an internal repository
+        id: allow-access
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" -L \
+          -X PUT \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GK_PAT }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}/${{ matrix.repository }}/actions/permissions/access \
+          -d '{"access_level":"enterprise"}')
+          echo "response=$response" >> $GITHUB_ENV
+        continue-on-error: true
+
+      - name: Replace Repository Topics
+        id: replace-topics
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+            const response = await github.rest.repos.replaceAllTopics({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+              names: []
+            });
+            return response.status;
+        continue-on-error: true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: repo_setting_report
+            path: ${{ github.workspace }}/source-repo/output
+
+
+#   report:
+#     name: Generate Report
+#     runs-on: ubuntu-latest
+#     needs: setting-meet-standard
+#     steps:
+#       - name: Generate Report
+#         uses: actions/github-script@v6
+#         with:
+#           github-token: ${{ secrets.GK_PAT }}
+#           script: |
+#             const { context } = require('@actions/github');
+#             const fs = require('fs');
+
+#             const repositories = ${{ fromJson(needs['setting-meet-standard'].outputs['repository']) }};
+#             let report = '## Repository Settings Report\n\n';
+
+#             for (const repo of repositories) {
+#               report += `### Repository: ${repo}\n`;
+#               report += `- Enable Different Settings for Repository: ${needs['setting-meet-standard']['steps']['enable-settings']['outcome']}\n`;
+#               report += `- Determine Default Branch: ${needs['setting-meet-standard']['steps']['default-branch']['outcome']}\n`;
+#               report += `- Enable Branch Protection Rule for Repo: ${needs['setting-meet-standard']['steps']['branch-protection']['outcome']}\n`;
+#               report += `- Enable Vulnerability alerts: ${needs['setting-meet-standard']['steps']['enable-alerts']['outcome']}\n`;
+#               report += `- Require Signed Commits: ${needs['setting-meet-standard']['steps']['signed-commits']['outcome']}\n`;
+#               report += `- Enable actions in repository: ${needs['setting-meet-standard']['steps']['enable-actions']['outcome']}\n`;
+#               report += `- Allowing access to components in an internal repository: ${needs['setting-meet-standard']['steps']['allow-access']['outcome']}\n`;
+#               report += `- Replace Repository Topics: ${needs['setting-meet-standard']['steps']['replace-topics']['outcome']}\n`;
+#               report += '\n';
+#             }
+
+#             fs.writeFileSync('report.md', report);
+
+#       - name: Create GitHub Issue Comment with Report
+#         uses: actions/github-script@v6
+#         with:
+#           github-token: ${{ secrets.GK_PAT }}
+#           script: |
+#             const { context } = require('@actions/github');
+#             const fs = require('fs');
+
+#             const report = fs.readFileSync('report.md', 'utf8');
+#             await github.rest.issues.createComment({
+#               issue_number: context.issue.number,
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               body: report
+#             });
+
+#       - name: Upload Report
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: repository-settings-report
+#           path: report.md
