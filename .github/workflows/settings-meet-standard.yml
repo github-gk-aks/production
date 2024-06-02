@@ -245,14 +245,21 @@ jobs:
         run: |
           const fs = require('fs');
           const path = require('path');
-          response=$(curl -s -o /dev/null -w "%{http_code}" -L \
-          -X PUT \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GK_PAT }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}/${{ matrix.repository }}/actions/permissions/access \
-          -d '{"access_level":"enterprise"}')
-          echo "response=$response" >> $GITHUB_ENV
+
+          const response = await github.rest.actions.setWorkflowAccessToRepository({
+              owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+              repo: '${{ matrix.repository }}',
+              access_level: organization
+            });
+
+            #   response=$(curl -s -o /dev/null -w "%{http_code}" -L \
+            #   -X PUT \
+            #   -H "Accept: application/vnd.github+json" \
+            #   -H "Authorization: Bearer ${{ secrets.GK_PAT }}" \
+            #   -H "X-GitHub-Api-Version: 2022-11-28" \
+            #   https://api.github.com/repos/${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}/${{ matrix.repository }}/actions/permissions/access \
+            #   -d '{"access_level":"enterprise"}')
+            #   echo "response=$response" >> $GITHUB_ENV
 
           const statusCode = response.status;
           const repoName = '${{ matrix.repository }}';
@@ -283,7 +290,7 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             const response = await github.rest.repos.replaceAllTopics({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
               repo: '${{ matrix.repository }}',
