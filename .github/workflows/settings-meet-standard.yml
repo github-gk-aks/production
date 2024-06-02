@@ -252,7 +252,7 @@ jobs:
           const response = await github.rest.actions.setWorkflowAccessToRepository({
               owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
               repo: '${{ matrix.repository }}',
-              access_level: 'enterprise'
+              access_level: 'organization'
             });
 
              /* response=$(curl -s -o /dev/null -w "%{http_code}" -L \
