@@ -337,11 +337,11 @@ jobs:
             fs.appendFileSync(filePath, message + '\n'); 
         continue-on-error: true
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload repo migration status
+        uses: actions/upload-artifact@v3
         with:
-            name: repo_setting_report
-            path: ${{ github.workspace }}/source-repo/output
+          name: statuses
+          path: ${{ matrix.repository }}.txt
 
 
 #   report:

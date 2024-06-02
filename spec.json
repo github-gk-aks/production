@@ -1,0 +1,18 @@
+{
+    "firstgithubrepo": {
+        "repository": "firstgithubrepo",
+        "organisation": "github-gk-aks"
+    },
+    "secondgithubrepo": {
+        "repository": "secondgithubrepo",
+        "organisation": "github-gk-aks"
+    },
+    "thirdgithubrepo": {
+        "repository": "thirdgithubrepo",
+        "organisation": "github-gk-aks"
+    },
+    "fourthgithubrepo": {
+        "repository": "fourthgithubrepo",
+        "organisation": "github-gk-aks"
+    }
+}
