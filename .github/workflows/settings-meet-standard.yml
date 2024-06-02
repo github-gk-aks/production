@@ -88,8 +88,23 @@ jobs:
 
       - name: Determine Default Branch
         id: default-branch
-        run: echo "::set-output name=default_branch::$(git ls-remote --symref https://github.com/${{ github.repository }} HEAD | awk -F '/' '{print $NF}' | awk '{print $1}')"
-        continue-on-error: true
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GK_PAT }}
+          script: |
+
+            const { data: repository } = await github.rest.repos.get({
+            owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
+            repo: '${{ matrix.repository }}'
+            });
+
+            const defaultBranch = repository.default_branch;
+            core.setOutput("default_branch", defaultBranch);
+
+      # - name: Determine Default Branch
+      #   id: default-branch
+      #   run: echo "::set-output name=default_branch::$(git ls-remote --symref https://github.com/${{ github.repository }} HEAD | awk -F '/' '{print $NF}' | awk '{print $1}')"
+      #   continue-on-error: true
 
       - name: Enable Branch Protection Rule for Repo
         id: branch-protection
@@ -177,7 +192,7 @@ jobs:
             try {
                 const response = await github.rest.repos.enableVulnerabilityAlerts({
                 owner: '${{ fromJSON(github.event.issue.body)[matrix.repository].organisation }}',
-                repo: '${{ matrix.repository }}',
+                repo: '${{ matrix.repository }}'
                 });
 
                 const statusCode = response.status;
