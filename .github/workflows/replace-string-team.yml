@@ -19,7 +19,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GK_PAT }}
-          ref: ${{ github.event.client_payload.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -36,7 +35,7 @@ jobs:
         env:
           EXCEL_FILE_SOURCE: ${{ github.workspace }}/input_migration/Source-GitHub-Teams.xlsx
           EXCEL_FILE_TARGET: ${{ github.workspace }}/input_migration/String-Replacement-Teams-Only.xlsx
-          REPOSITORY: ${{ github.event.client_payload.repository }}
+          REPOSITORY: ${{ github.event.inputs.repository }}
           GITHUB_WORKSPACE: ${{ github.workspace }}
 
       - name: Import GPG key
