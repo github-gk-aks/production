@@ -32,7 +32,9 @@ def replace_strings(excel_path, repo_path):
         # Iterate through all files
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+                original_content = f.read()
+
+            content = original_content
 
             # Iterate through Excel rows
             for row in sheet.iter_rows(min_row=2, values_only=True):
@@ -42,9 +44,14 @@ def replace_strings(excel_path, repo_path):
                 # Replace strings in file content
                 content = content.replace(original_string, replacement_string)
 
-            # Write back to the file
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(content)
+            # Write back to the file only if content has changed
+            if content != original_content:
+                with open(file_path, 'w', encoding='utf-8', newline='') as f:
+                    f.write(content)
+                print(f"Updated file: {file_path}")
+            else:
+                print(f"No changes in file: {file_path}")
+
         except Exception as e:
             print(f"Error processing file {file_path}: {str(e)}")
 
