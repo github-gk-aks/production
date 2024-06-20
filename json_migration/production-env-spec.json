@@ -1,0 +1,20 @@
+{
+    "PROD_ENV_1": {
+        "secretname": "PROD_ENV_1",
+        "destinationEnvironmentName": "prod",
+        "destinationRepositoryId": "123456789",
+        "destinationPersonalAccessTokenName": "DST_SECRET_TOKEN"
+    },
+    "PROD_ENV_2": {
+        "secretname": "PROD_ENV_2",
+        "destinationEnvironmentName": "test",
+        "destinationRepositoryId": "123456789",
+        "destinationPersonalAccessTokenName": "DST_SECRET_TOKEN"
+    },
+    "PROD_ENV_3": {
+        "secretname": "PROD_ENV_3",
+        "destinationEnvironmentName": "qa",
+        "destinationRepositoryId": "123456789",
+        "destinationPersonalAccessTokenName": "DST_SECRET_TOKEN"
+    }
+}
