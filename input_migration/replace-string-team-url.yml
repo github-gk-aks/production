@@ -1,0 +1,41 @@
+name: Github API REST LIBRARY
+#gk-aks-DIGITAL
+on:
+  push:
+
+jobs:
+  rest-api-library:
+    if: ${{ github.event_name != 'push' }}
+    runs-on: windows-latest
+    env: 
+      GITHUB_USER_TOKEN: PRE_A_TOKEN
+      GK_TOKEN: B_TOKEN
+      PK_TOKEN: a_token_post
+      NK_TOKEN: a_token
+      SK_TOKEN: A_TOKEN_POST
+    steps:
+      - name: Run GitHub Script
+        uses: actions/github-script@v6
+        with:
+          script: |
+            for (const id in github.rest.repos) {
+              try {
+                if (typeof github.rest.repos[id] === "function") {
+                  console.log(id);
+                }
+              } catch (err) {
+                console.error(err);
+                a_token_post = test;
+              }
+            }
+      - name: Checking out the repository
+        uses: actions/checkout@v4
+        with:
+          repository: gk-aks-Confidential/thirdgithubrepo
+          token: ${{ secrets.GITHUB_TOKEN}}
+          ref: v2.2.1
+          path: ./github/actions/Coke2litre
+      - name: Get Commit Artifacts
+        uses: ./github/actions/Coke2litre
+        with:
+          CommitSha: ${{github.sha}}
